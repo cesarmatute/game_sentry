@@ -33,6 +33,17 @@ class PinNotifier extends Notifier<PinState> {
         orElse: () => throw Exception('No parent found with this PIN'),
       );
       
+      // Check if the PIN has expired (10 minutes = 600 seconds)
+      if (matchingParent.pinCreated != null) {
+        final now = DateTime.now();
+        final pinAge = now.difference(matchingParent.pinCreated!);
+        if (pinAge.inMinutes > 10) {
+          // PIN has expired, need to show error
+          state = state.copyWith(status: PinStatus.error, errorMessage: 'PIN has expired. Please generate a new one on your mobile device.');
+          return false;
+        }
+      }
+      
       // PIN is valid and we found the parent
       state = state.copyWith(status: PinStatus.verified);
       return true;
@@ -62,6 +73,16 @@ class PinNotifier extends Notifier<PinState> {
         (parent) => parent.pin == pin,
         orElse: () => throw Exception('No parent found with this PIN'),
       );
+      
+      // Check if the PIN has expired (10 minutes = 600 seconds)
+      if (matchingParent.pinCreated != null) {
+        final now = DateTime.now();
+        final pinAge = now.difference(matchingParent.pinCreated!);
+        if (pinAge.inMinutes > 10) {
+          // PIN has expired
+          return null;
+        }
+      }
       
       return matchingParent.id;
     } on Exception catch (e) {

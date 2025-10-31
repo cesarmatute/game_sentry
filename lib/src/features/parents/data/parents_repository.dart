@@ -23,6 +23,7 @@ class ParentsRepository {
     String? avatarUrl,
     List<String>? kids,
     int pin = 0,
+    DateTime? pinCreated,
   }) async {
     try {
       // ignore: deprecated_member_use
@@ -38,6 +39,7 @@ class ParentsRepository {
           'avatar_url': avatarUrl,
           'kids': kids,
           'pin': pin,
+          'pin_created': pinCreated?.toIso8601String(),
         },
       );
       return Parent.fromDocument(response);
@@ -73,6 +75,7 @@ class ParentsRepository {
     String? avatarUrl,
     List<String>? kids,
     int? pin,
+    DateTime? pinCreated,
   }) async {
     try {
       // ignore: deprecated_member_use
@@ -88,6 +91,7 @@ class ParentsRepository {
           'avatar_url': avatarUrl,
           'kids': kids,
           'pin': pin,
+          'pin_created': pinCreated?.toIso8601String(),
         },
       );
       return Parent.fromDocument(response);
@@ -164,9 +168,9 @@ class ParentsRepository {
     }
   }
   
-  Future<void> updateParentPin(String parentId, int pin) async {
+  Future<void> updateParentPin(String parentId, int pin, [DateTime? pinCreated]) async {
     try {
-      // Update only the pin field, not the entire parent data
+      // Update only the pin and pin_created fields, not the entire parent data
       // ignore: deprecated_member_use
       await _databases.updateDocument(
         databaseId: databaseId,
@@ -174,6 +178,25 @@ class ParentsRepository {
         documentId: parentId,
         data: {
           'pin': pin,
+          'pin_created': pinCreated?.toIso8601String(),
+        },
+      );
+    } on AppwriteException {
+      rethrow;
+    }
+  }
+
+  Future<void> updateParentPinAndTimestamp(String parentId, int pin) async {
+    try {
+      // Update pin and set the current timestamp for pin_created
+      // ignore: deprecated_member_use
+      await _databases.updateDocument(
+        databaseId: databaseId,
+        collectionId: parentsCollectionId,
+        documentId: parentId,
+        data: {
+          'pin': pin,
+          'pin_created': DateTime.now().toIso8601String(),
         },
       );
     } on AppwriteException {

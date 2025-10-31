@@ -10,6 +10,7 @@ class Parent extends Equatable {
   final String? avatarUrl;
   final List<String>? kids;
   final int pin;
+  final DateTime? pinCreated;
 
   const Parent({
     required this.id,
@@ -20,6 +21,7 @@ class Parent extends Equatable {
     this.avatarUrl,
     this.kids,
     this.pin = 0,
+    this.pinCreated,
   });
 
   factory Parent.fromDocument(Document document) {
@@ -32,6 +34,7 @@ class Parent extends Equatable {
       avatarUrl: document.data['avatar_url'] as String?,
       kids: document.data['kids'] != null ? List<String>.from(document.data['kids']) : null,
       pin: document.data['pin'] as int? ?? 0,
+      pinCreated: document.data['pin_created'] != null ? DateTime.parse(document.data['pin_created'] as String) : null,
     );
   }
 
@@ -45,6 +48,7 @@ class Parent extends Equatable {
       avatarUrl: prefs['avatar_url'] as String?,
       kids: prefs['kids'] != null ? List<String>.from(prefs['kids']) : null,
       pin: prefs['pin'] as int? ?? 0,
+      pinCreated: prefs['pin_created'] != null ? DateTime.parse(prefs['pin_created'] as String) : null,
     );
   }
 
@@ -57,6 +61,7 @@ class Parent extends Equatable {
     String? avatarUrl,
     List<String>? kids,
     int? pin,
+    DateTime? pinCreated,
   }) {
     return Parent(
       id: id ?? this.id,
@@ -67,6 +72,7 @@ class Parent extends Equatable {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       kids: kids ?? this.kids,
       pin: pin ?? this.pin,
+      pinCreated: pinCreated ?? this.pinCreated,
     );
   }
 
@@ -80,5 +86,6 @@ class Parent extends Equatable {
         avatarUrl,
         kids,
         pin,
+        pinCreated,
       ];
 }

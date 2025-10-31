@@ -85,6 +85,7 @@ class AuthNotifier extends Notifier<AuthState> {
             username: username,
             email: user.email,
             pin: 0, // Default PIN is 0
+            pinCreated: null, // No PIN timestamp for default
           );
           state = state.copyWith(
             authStatus: AuthStatus.authenticated,
@@ -133,6 +134,7 @@ class AuthNotifier extends Notifier<AuthState> {
               username: username,
               email: user.email,
               pin: 0, // Default PIN is 0
+              pinCreated: null, // No PIN timestamp for default
             );
             state = state.copyWith(
               authStatus: AuthStatus.authenticated,
@@ -166,8 +168,8 @@ class AuthNotifier extends Notifier<AuthState> {
 
   Future<void> updateUserWithPin(appwrite_models.User user, int pin) async {
     try {
-      // Update or create parent document with the PIN
-      await _parentsRepository.updateParentPin(user.$id, pin);
+      // Update or create parent document with the PIN and timestamp
+      await _parentsRepository.updateParentPinAndTimestamp(user.$id, pin);
       
       // Update auth state to show the user as authenticated
       state = state.copyWith(
@@ -184,6 +186,7 @@ class AuthNotifier extends Notifier<AuthState> {
           username: user.name,
           email: user.email,
           pin: pin,
+          pinCreated: DateTime.now(), // Set current timestamp
         );
         
         state = state.copyWith(

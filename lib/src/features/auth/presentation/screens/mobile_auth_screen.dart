@@ -170,8 +170,8 @@ class _MobileAuthScreenState extends ConsumerState<MobileAuthScreen> {
       final pin = int.parse(pinRepo.generateAndStorePin(user.$id));
       
       try {
-        // Update the parent's PIN in the database
-        await parentsRepository.updateParentPin(user.$id, pin);
+        // Update the parent's PIN and timestamp in the database
+        await parentsRepository.updateParentPinAndTimestamp(user.$id, pin);
         
         // Show the generated PIN to the user
         _showPinDialog(context, pin.toString());
