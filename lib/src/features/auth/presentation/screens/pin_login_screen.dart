@@ -156,12 +156,16 @@ class _PinLoginScreenState extends ConsumerState<PinLoginScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey[50], // Light grey background for contrast
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 1,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 2,
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -188,7 +192,7 @@ class _PinLoginScreenState extends ConsumerState<PinLoginScreen> {
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
                             maxLength: 1,
-                            obscureText: true,
+                            obscureText: false, // Changed to false so PIN numbers are visible
                             enabled: pinState.status != PinStatus.verifying,
                             inputFormatters: [
                               LengthLimitingTextInputFormatter(1),
@@ -198,10 +202,21 @@ class _PinLoginScreenState extends ConsumerState<PinLoginScreen> {
                               counterText: '',
                               border: const OutlineInputBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(8)),
+                                borderSide: BorderSide(color: Colors.grey, width: 2),
                               ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(8)),
+                                borderSide: BorderSide(color: Colors.deepPurple, width: 2),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
                               contentPadding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 24, 
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87, // Ensure the text is clearly visible
+                            ),
                             onSubmitted: (value) {
                               if (index < 5) {
                                 _pinFocusNodes[index + 1].requestFocus();
