@@ -1,0 +1,4 @@
+  audioplayers: ^6.0.0
+
+
+dev_dependencies:

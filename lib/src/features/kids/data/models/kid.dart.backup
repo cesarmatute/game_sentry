@@ -1,0 +1,167 @@
+import 'package:appwrite/models.dart';
+import 'package:equatable/equatable.dart';
+
+class Kid extends Equatable {
+  final String id;
+  final String parentId;
+  final String username;
+  final DateTime? dob;
+  final String? avatarUrl;
+  final Duration maxDailyPlaytime;
+  final Duration maxSessionLimit;
+  final Duration minBreakTime;
+  final String? playtimeStart;
+  final String? playtimeEnd;
+  final String? lunchBreakStart;
+  final String? lunchBreakEnd;
+  final bool enforceBrushing;
+  final bool enforceLunchBreak;
+  final bool hasPin;
+  final int? dailyPlayed;
+  final DateTime? lastDatePlayed;
+  final int? sessionPlayed;
+  final DateTime? lastBreakTime;
+  final DateTime? lastMandatoryBreak;
+  final Duration bankedTime;
+  final Duration maxBankedTime;
+  final bool hasHadLunchToday;
+  final bool hasBrushedTeethAfterLunch;
+
+  const Kid({
+    required this.id,
+    required this.parentId,
+    required this.username,
+    this.dob,
+    this.avatarUrl,
+    required this.maxDailyPlaytime,
+    required this.maxSessionLimit,
+    required this.minBreakTime,
+    this.playtimeStart,
+    this.playtimeEnd,
+    this.lunchBreakStart,
+    this.lunchBreakEnd,
+    required this.enforceBrushing,
+    required this.enforceLunchBreak,
+    required this.hasPin,
+    this.dailyPlayed,
+    this.lastDatePlayed,
+    this.sessionPlayed,
+    this.lastBreakTime,
+    this.lastMandatoryBreak,
+    this.bankedTime = Duration.zero,
+    this.maxBankedTime = const Duration(hours: 2), // Default 2 hours max bank time
+    this.hasHadLunchToday = false,
+    this.hasBrushedTeethAfterLunch = false,
+  });
+
+  factory Kid.fromDocument(Document document) {
+    return Kid(
+      id: document.$id,
+      parentId: (document.data['parent_id'] is String) ? document.data['parent_id'] as String : '',
+      username: document.data['username'] ?? '',
+      dob: document.data['dob'] != null ? DateTime.parse(document.data['dob'] as String) : null,
+      avatarUrl: document.data['avatar_url'] as String?,
+      maxDailyPlaytime: Duration(minutes: document.data['maximum_daily_limit'] as int? ?? 0),
+      maxSessionLimit: Duration(minutes: document.data['maximum_session_limit'] as int? ?? 0),
+      minBreakTime: Duration(minutes: document.data['minimum_break'] as int? ?? 0),
+      playtimeStart: document.data['playtime_start'] as String?,
+      playtimeEnd: document.data['playtime_end'] as String?,
+      lunchBreakStart: document.data['lunch_break_start'] as String?,
+      lunchBreakEnd: document.data['lunch_break_end'] as String?,
+      enforceBrushing: document.data['enforce_brush'] as bool? ?? false,
+      enforceLunchBreak: document.data['enforce_lunch_break'] as bool? ?? true,
+      hasPin: document.data['has_pin'] as bool? ?? false,
+      dailyPlayed: document.data['daily_played'] as int?,
+      lastDatePlayed: document.data['last_date_played'] != null ? DateTime.parse(document.data['last_date_played'] as String) : null,
+      sessionPlayed: document.data['session_played'] as int?,
+      lastBreakTime: document.data['last_break_time'] != null ? DateTime.parse(document.data['last_break_time'] as String) : null,
+      lastMandatoryBreak: document.data['last_mandatory_break'] != null ? DateTime.parse(document.data['last_mandatory_break'] as String) : null,
+      bankedTime: Duration(minutes: document.data['banked_time'] as int? ?? 0),
+      maxBankedTime: Duration(hours: document.data['max_banked_time'] as int? ?? 2),
+      hasHadLunchToday: document.data['has_had_lunch_today'] as bool? ?? false,
+      hasBrushedTeethAfterLunch: document.data['has_brushed_teeth_after_lunch'] as bool? ?? false,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        parentId,
+        username,
+        dob,
+        avatarUrl,
+        maxDailyPlaytime,
+        maxSessionLimit,
+        minBreakTime,
+        playtimeStart,
+        playtimeEnd,
+        lunchBreakStart,
+        lunchBreakEnd,
+        enforceBrushing,
+        enforceLunchBreak,
+        hasPin,
+        dailyPlayed,
+        lastDatePlayed,
+        sessionPlayed,
+        lastBreakTime,
+        lastMandatoryBreak,
+        bankedTime,
+        maxBankedTime,
+        hasHadLunchToday,
+        hasBrushedTeethAfterLunch,
+      ];
+
+  Kid copyWith({
+    String? id,
+    String? parentId,
+    String? username,
+    DateTime? dob,
+    String? avatarUrl,
+    Duration? maxDailyPlaytime,
+    Duration? maxSessionLimit,
+    Duration? minBreakTime,
+    String? playtimeStart,
+    String? playtimeEnd,
+    String? lunchBreakStart,
+    String? lunchBreakEnd,
+    bool? enforceBrushing,
+    bool? enforceLunchBreak,
+    bool? hasPin,
+    int? dailyPlayed,
+    DateTime? lastDatePlayed,
+    int? sessionPlayed,
+    DateTime? lastBreakTime,
+    DateTime? lastMandatoryBreak,
+    Duration? bankedTime,
+    Duration? maxBankedTime,
+    bool? hasHadLunchToday,
+    bool? hasBrushedTeethAfterLunch,
+  }) {
+    return Kid(
+      id: id ?? this.id,
+      parentId: parentId ?? this.parentId,
+      username: username ?? this.username,
+      dob: dob ?? this.dob,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      maxDailyPlaytime: maxDailyPlaytime ?? this.maxDailyPlaytime,
+      maxSessionLimit: maxSessionLimit ?? this.maxSessionLimit,
+      minBreakTime: minBreakTime ?? this.minBreakTime,
+      playtimeStart: playtimeStart ?? this.playtimeStart,
+      playtimeEnd: playtimeEnd ?? this.playtimeEnd,
+      lunchBreakStart: lunchBreakStart ?? this.lunchBreakStart,
+      lunchBreakEnd: lunchBreakEnd ?? this.lunchBreakEnd,
+      enforceBrushing: enforceBrushing ?? this.enforceBrushing,
+      enforceLunchBreak: enforceLunchBreak ?? this.enforceLunchBreak,
+      hasPin: hasPin ?? this.hasPin,
+      dailyPlayed: dailyPlayed ?? this.dailyPlayed,
+      lastDatePlayed: lastDatePlayed ?? this.lastDatePlayed,
+      sessionPlayed: sessionPlayed ?? this.sessionPlayed,
+      lastBreakTime: lastBreakTime ?? this.lastBreakTime,
+      lastMandatoryBreak: lastMandatoryBreak ?? this.lastMandatoryBreak,
+      bankedTime: bankedTime ?? this.bankedTime,
+      maxBankedTime: maxBankedTime ?? this.maxBankedTime,
+      hasHadLunchToday: hasHadLunchToday ?? this.hasHadLunchToday,
+      hasBrushedTeethAfterLunch: hasBrushedTeethAfterLunch ?? this.hasBrushedTeethAfterLunch,
+    );
+  }
+}

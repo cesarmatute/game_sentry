@@ -1,0 +1,18 @@
+name: game_sentry_examples
+description: Example project for game_sentry.
+publish_to: 'none' # Remove this line if you wish to publish this package
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  game_sentry:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0

@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "695675136935",
+    "firebase_url": "https://game-sentry-qcayd-default-rtdb.firebaseio.com",
+    "project_id": "game-sentry-qcayd",
+    "storage_bucket": "game-sentry-qcayd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695675136935:android:8c740c6725edea65cde482",
+        "android_client_info": {
+          "package_name": "com.example.game_sentry"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "695675136935-e1qb1jr9129n7ut0ud6rv3nfg9693nqt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.game_sentry",
+            "certificate_hash": "22f337e947999c4f67a16e7b23b8c3f4bd3ffab9"
+          }
+        },
+        {
+          "client_id": "695675136935-iduip413cieugl5g6biuf5kij6deqc23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyNWOq6C_gF1lhreK9Zm5E7b8qbVaOysI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "695675136935-iduip413cieugl5g6biuf5kij6deqc23.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695675136935:android:a27fb430ef495acccde482",
+        "android_client_info": {
+          "package_name": "com.example.gtt_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "695675136935-iduip413cieugl5g6biuf5kij6deqc23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyNWOq6C_gF1lhreK9Zm5E7b8qbVaOysI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "695675136935-iduip413cieugl5g6biuf5kij6deqc23.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
