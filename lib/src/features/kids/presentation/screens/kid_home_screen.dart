@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:game_sentry/src/core/utils/duration_formatter.dart';
+import 'package:game_sentry/src/features/gaming/data/models/session_state.dart';
 
 import 'package:game_sentry/src/features/kids/presentation/widgets/kid_custom_drawer.dart';
 import 'package:game_sentry/src/features/parents/presentation/screens/parent_dashboard_screen.dart';
@@ -201,7 +202,7 @@ class KidHomeScreen extends ConsumerWidget {
         debugPrint('New enforceLunchBreak: ${updatedKid.enforceLunchBreak}');
         
         // Update the gaming session notifier with the new kid data
-        ref.read(gamingSessionNotifierProvider(selectedKid).notifier).updateKidData(updatedKid);
+        ref.read(gamingSessionNotifierProvider.notifier).updateKidData(updatedKid);
         
         // Update the selected kid with fresh data
         ref.read(selectedKidProvider.notifier).kid = updatedKid;
@@ -236,15 +237,30 @@ class _GamingTimerWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionState = ref.watch(gamingSessionNotifierProvider(kid));
+    final sessionState = ref.watch(gamingSessionForKidProvider(kid.id));
+    
+    // Fallback to a default state if the specific kid's state isn't available
+    final displayState = sessionState ?? SessionState(
+      kid: kid,
+      canStart: true,
+      dailyTimeUsed: Duration(seconds: kid.dailyPlayed),
+      timeUntilBreak: Duration(
+        minutes: kid.maximumSessionLimit - (kid.sessionPlayed ~/ 60),
+      ).abs(),
+      dailyTimeRemaining: Duration(
+        minutes: kid.maximumDailyLimit - (kid.dailyPlayed ~/ 60),
+      ).abs(),
+      currentSessionTime: Duration(seconds: kid.sessionPlayed),
+      isActive: false,
+    );
     
     // Check if the kid data in the session state is different from the current kid
     // This can happen when the kid data is updated externally (e.g., from parent view)
-    if (sessionState.kid.enforceLunchBreak != kid.enforceLunchBreak ||
-        sessionState.kid.enforceBrush != kid.enforceBrush) {
+    if (displayState.kid.enforceLunchBreak != kid.enforceLunchBreak ||
+        displayState.kid.enforceBrush != kid.enforceBrush) {
       // Update the gaming session notifier with the latest kid data
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(gamingSessionNotifierProvider(kid).notifier).updateKidData(kid);
+        ref.read(gamingSessionNotifierProvider.notifier).updateKidData(kid);
       });
     }
 
@@ -281,7 +297,7 @@ class _GamingTimerWidget extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    sessionState.isActive ? 'Gaming in progress...' : 'Ready to play?',
+                    displayState.isActive ? 'Gaming in progress...' : 'Ready to play?',
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -298,18 +314,18 @@ class _GamingTimerWidget extends ConsumerWidget {
               Expanded(
                 child: _TimeCard(
                   title: 'Time Until Break',
-                  timeRemaining: sessionState.timeUntilBreak,
+                  timeRemaining: displayState.timeUntilBreak,
                   maxTime: Duration(minutes: kid.maximumSessionLimit),
-                  color: sessionState.breakWarning ? Colors.orange : Colors.blue,
+                  color: displayState.breakWarning ? Colors.orange : Colors.blue,
                   icon: Icons.timer,
-                  isWarning: sessionState.breakWarning,
+                  isWarning: displayState.breakWarning,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _TimeCard(
                   title: 'Daily Time',
-                  timeRemaining: sessionState.dailyTimeRemaining,
+                  timeRemaining: displayState.dailyTimeRemaining,
                   maxTime: Duration(minutes: kid.maximumDailyLimit),
                   color: Colors.green,
                   icon: Icons.today,
@@ -326,7 +342,7 @@ class _GamingTimerWidget extends ConsumerWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  if (sessionState.isActive) ...[
+                  if (displayState.isActive) ...[
                     // Active session controls
                     Text(
                       'Session Started',
@@ -334,10 +350,10 @@ class _GamingTimerWidget extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Playing for: ${_formatDurationWithUnits(sessionState.currentSessionTime)}',
+                      'Playing for: ${_formatDurationWithUnits(displayState.currentSessionTime)}',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    if (sessionState.breakWarning) ...[
+                    if (displayState.breakWarning) ...[
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.all(8.0),
@@ -352,7 +368,7 @@ class _GamingTimerWidget extends ConsumerWidget {
                             Icon(Icons.warning, color: Colors.orange.shade700, size: 16),
                             const SizedBox(width: 8),
                             Text(
-                              'Break coming up in ${formatDuration(sessionState.timeUntilBreak)}',
+                              'Break coming up in ${formatDuration(displayState.timeUntilBreak)}',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Colors.orange.shade700,
                                 fontWeight: FontWeight.w600,
@@ -366,7 +382,7 @@ class _GamingTimerWidget extends ConsumerWidget {
                     ElevatedButton.icon(
                       onPressed: () async {
                         final success = await ref
-                            .read(gamingSessionNotifierProvider(kid).notifier)
+                            .read(gamingSessionNotifierProvider.notifier)
                             .stopSession();
                         if (context.mounted && success) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -383,7 +399,7 @@ class _GamingTimerWidget extends ConsumerWidget {
                     ),
                   ] else ...[
                     // Start session controls
-                    if (sessionState.canStart) ...[
+                    if (displayState.canStart) ...[
                       Text(
                         'Ready to Start Gaming?',
                         style: Theme.of(context).textTheme.titleMedium,
@@ -391,7 +407,7 @@ class _GamingTimerWidget extends ConsumerWidget {
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
                         onPressed: () async {
-                          final notifier = ref.read(gamingSessionNotifierProvider(kid).notifier);
+                          final notifier = ref.read(gamingSessionNotifierProvider.notifier);
                           
                           // Check if we need to ask about lunch
                           if (notifier.shouldAskAboutLunch()) {
@@ -436,7 +452,7 @@ class _GamingTimerWidget extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        sessionState.validationMessage ?? 'Unknown restriction',
+                        displayState.validationMessage ?? 'Unknown restriction',
                         style: Theme.of(context).textTheme.bodyMedium,
                         textAlign: TextAlign.center,
                       ),

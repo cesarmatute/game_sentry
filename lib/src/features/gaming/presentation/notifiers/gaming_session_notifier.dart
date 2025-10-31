@@ -2,16 +2,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:game_sentry/src/features/gaming/data/models/session_state.dart';
 import 'package:game_sentry/src/features/kids/data/models/kid.dart';
 
-// In Riverpod 3.0+, family providers are completely removed
-// This placeholder exists to allow compilation until architectural changes are made
-final gamingSessionNotifierProvider = NotifierProvider<GamingSessionNotifier, SessionState?>(
-  GamingSessionNotifier.new,
-);
+// Define a custom provider that can handle different kids using a parameter approach
+final gamingSessionNotifierProvider = 
+    NotifierProvider<GamingSessionNotifier, SessionState?>(GamingSessionNotifier.new);
+
+final gamingSessionForKidProvider = 
+    Provider.family<SessionState?, String>((ref, kidId) {
+  final globalState = ref.watch(gamingSessionNotifierProvider);
+  // Return the state only if it matches the requested kid ID
+  return globalState?.kid.id == kidId ? globalState : null;
+});
 
 class GamingSessionNotifier extends Notifier<SessionState?> {
   @override
   SessionState? build() {
-    // Placeholder implementation for compilation
+    // Initialize with a default state
     return null;
   }
   

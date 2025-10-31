@@ -84,6 +84,7 @@ class AuthNotifier extends Notifier<AuthState> {
             name: user.name,
             username: username,
             email: user.email,
+            pin: 0, // Default PIN is 0
           );
           state = state.copyWith(
             authStatus: AuthStatus.authenticated,
@@ -131,6 +132,7 @@ class AuthNotifier extends Notifier<AuthState> {
               name: user.name,
               username: username,
               email: user.email,
+              pin: 0, // Default PIN is 0
             );
             state = state.copyWith(
               authStatus: AuthStatus.authenticated,
@@ -162,6 +164,44 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  Future<void> updateUserWithPin(appwrite_models.User user, int pin) async {
+    try {
+      // Update or create parent document with the PIN
+      await _parentsRepository.updateParentPin(user.$id, pin);
+      
+      // Update auth state to show the user as authenticated
+      state = state.copyWith(
+        authStatus: AuthStatus.authenticated,
+        user: user,
+        kidCount: 0, // Initialize to 0, will be updated by refreshKidCount if needed
+      );
+    } catch (e) {
+      // If parent doesn't exist, create it with the PIN
+      try {
+        await _parentsRepository.createParent(
+          id: user.$id,
+          name: user.name,
+          username: user.name,
+          email: user.email,
+          pin: pin,
+        );
+        
+        state = state.copyWith(
+          authStatus: AuthStatus.authenticated,
+          user: user,
+          kidCount: 0, // Initialize to 0, will be updated by refreshKidCount if needed
+        );
+      } catch (createError) {
+        // If everything fails, just update the auth state without updating the parent
+        state = state.copyWith(
+          authStatus: AuthStatus.authenticated,
+          user: user,
+          kidCount: 0,
+        );
+      }
+    }
+  }
+  
   void updateUser(appwrite_models.User user) {
     // For desktop local accounts, we don't have Appwrite sessions,
     // but we still update the auth state to show the user as authenticated

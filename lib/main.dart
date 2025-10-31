@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:game_sentry/src/features/selection/parent_kid_picker_screen.dart';
+import 'package:game_sentry/src/features/auth/presentation/screens/pin_login_screen.dart';
 import 'package:game_sentry/src/features/settings/presentation/notifiers/theme_notifier.dart';
 import 'package:game_sentry/src/features/settings/presentation/notifiers/system_tray_notifier.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -158,11 +158,11 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener { // Add Wind
     final themeMode = ref.watch(themeNotifierProvider);
 
     Widget getInitialScreen() {
-      // Use Google Sign In on mobile platforms, parent selection on desktop
+      // Use Google Sign In on mobile platforms, PIN login on desktop
       if (Platform.isAndroid || Platform.isIOS) {
         return const MobileAuthScreen();
       } else {
-        return const ParentKidPickerScreen();
+        return const PinLoginScreen();
       }
     }
 

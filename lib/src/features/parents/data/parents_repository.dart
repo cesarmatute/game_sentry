@@ -22,6 +22,7 @@ class ParentsRepository {
     DateTime? dob,
     String? avatarUrl,
     List<String>? kids,
+    int pin = 0,
   }) async {
     try {
       // ignore: deprecated_member_use
@@ -36,6 +37,7 @@ class ParentsRepository {
           'dob': dob?.toIso8601String(),
           'avatar_url': avatarUrl,
           'kids': kids,
+          'pin': pin,
         },
       );
       return Parent.fromDocument(response);
@@ -70,6 +72,7 @@ class ParentsRepository {
     DateTime? dob,
     String? avatarUrl,
     List<String>? kids,
+    int? pin,
   }) async {
     try {
       // ignore: deprecated_member_use
@@ -84,6 +87,7 @@ class ParentsRepository {
           'dob': dob?.toIso8601String(),
           'avatar_url': avatarUrl,
           'kids': kids,
+          'pin': pin,
         },
       );
       return Parent.fromDocument(response);
@@ -155,6 +159,23 @@ class ParentsRepository {
           },
         );
       }
+    } on AppwriteException {
+      rethrow;
+    }
+  }
+  
+  Future<void> updateParentPin(String parentId, int pin) async {
+    try {
+      // Update only the pin field, not the entire parent data
+      // ignore: deprecated_member_use
+      await _databases.updateDocument(
+        databaseId: databaseId,
+        collectionId: parentsCollectionId,
+        documentId: parentId,
+        data: {
+          'pin': pin,
+        },
+      );
     } on AppwriteException {
       rethrow;
     }

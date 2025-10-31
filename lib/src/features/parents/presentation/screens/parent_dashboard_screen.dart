@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
 import 'package:game_sentry/src/features/auth/presentation/notifiers/auth_notifier.dart';
+import 'package:game_sentry/src/features/gaming/data/models/session_state.dart';
+import 'package:game_sentry/src/features/gaming/presentation/notifiers/gaming_session_notifier.dart';
+import 'package:game_sentry/src/features/home/presentation/widgets/custom_drawer.dart';
 import 'package:game_sentry/src/features/kids/data/kids_repository.dart';
 import 'package:game_sentry/src/features/kids/data/models/kid.dart';
-import 'package:game_sentry/src/features/gaming/presentation/notifiers/gaming_session_notifier.dart';
-import 'package:game_sentry/src/features/selection/selected_kid_provider.dart';
-import 'package:game_sentry/src/features/kids/presentation/screens/kid_home_screen.dart';
-import 'package:game_sentry/src/features/home/presentation/widgets/custom_drawer.dart';
-import 'dart:io';
 import 'package:game_sentry/src/features/kids/presentation/screens/edit_kid_screen.dart';
+import 'package:game_sentry/src/features/kids/presentation/screens/kid_home_screen.dart';
+import 'package:game_sentry/src/features/selection/selected_kid_provider.dart';
 
 class ParentDashboardScreen extends ConsumerStatefulWidget {
   const ParentDashboardScreen({super.key});
@@ -269,9 +270,24 @@ class _KidCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Get session state for this kid to show real-time info
-    final sessionState = ref.watch(gamingSessionNotifierProvider(kid));
+    // Get session state for this specific kid using the new provider pattern
+    final sessionState = ref.watch(gamingSessionForKidProvider(kid.id));
     
+    // If no specific session state is available for this kid, use a default state
+    final displayState = sessionState ?? SessionState(
+      kid: kid,
+      dailyTimeUsed: Duration(seconds: kid.dailyPlayed),
+      timeUntilBreak: Duration(
+        minutes: kid.maximumSessionLimit - (kid.sessionPlayed ~/ 60),
+      ).abs(),
+      dailyTimeRemaining: Duration(
+        minutes: kid.maximumDailyLimit - (kid.dailyPlayed ~/ 60),
+      ).abs(),
+      currentSessionTime: Duration(seconds: kid.sessionPlayed),
+      isActive: false, // Default to not active since we can't access the state for this specific kid
+      canStart: true,  // Default to true since we can't check the actual state
+    );
+
     return Card(
       elevation: 4,
       child: Padding(
@@ -310,11 +326,11 @@ class _KidCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        sessionState.isActive 
+                        displayState.isActive 
                           ? 'Playing now' 
                           : 'Available to play',
                         style: TextStyle(
-                          color: sessionState.isActive ? Colors.green : Colors.grey,
+                          color: displayState.isActive ? Colors.green : Colors.grey,
                           fontSize: 14,
                         ),
                       ),
@@ -326,7 +342,7 @@ class _KidCard extends ConsumerWidget {
                   width: 12,
                   height: 12,
                   decoration: BoxDecoration(
-                    color: sessionState.isActive ? Colors.green : Colors.grey,
+                    color: displayState.isActive ? Colors.green : Colors.grey,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -339,19 +355,19 @@ class _KidCard extends ConsumerWidget {
               children: [
                 _SmallStat(
                   label: 'Today',
-                  value: '${sessionState.dailyTimeUsed.inHours}h ${sessionState.dailyTimeUsed.inMinutes.remainder(60)}m',
+                  value: '${displayState.dailyTimeUsed.inHours}h ${displayState.dailyTimeUsed.inMinutes.remainder(60)}m',
                   icon: Icons.today,
                 ),
                 _SmallStat(
                   label: 'Time Until Break',
-                  value: sessionState.timeUntilBreak.inMinutes > 0 
-                      ? '${sessionState.timeUntilBreak.inMinutes}m' 
+                  value: displayState.timeUntilBreak.inMinutes > 0 
+                      ? '${displayState.timeUntilBreak.inMinutes}m' 
                       : '<1m',
                   icon: Icons.timer,
                 ),
                 _SmallStat(
                   label: 'Remaining',
-                  value: '${sessionState.dailyTimeRemaining.inHours}h ${sessionState.dailyTimeRemaining.inMinutes.remainder(60)}m',
+                  value: '${displayState.dailyTimeRemaining.inHours}h ${displayState.dailyTimeRemaining.inMinutes.remainder(60)}m',
                   icon: Icons.hourglass_bottom,
                 ),
               ],

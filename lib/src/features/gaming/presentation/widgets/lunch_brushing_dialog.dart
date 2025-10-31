@@ -38,7 +38,7 @@ class LunchBrushingDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () {
-            final notifier = ref.read(gamingSessionNotifierProvider(kid).notifier);
+            final notifier = ref.read(gamingSessionNotifierProvider.notifier);
             if (isLunchQuestion) {
               notifier.setHasHadLunch(false);
             } else {
@@ -50,7 +50,7 @@ class LunchBrushingDialog extends ConsumerWidget {
         ),
         ElevatedButton(
           onPressed: () async {
-            final notifier = ref.read(gamingSessionNotifierProvider(kid).notifier);
+            final notifier = ref.read(gamingSessionNotifierProvider.notifier);
             if (isLunchQuestion) {
               notifier.setHasHadLunch(true);
               Navigator.of(context).pop();
